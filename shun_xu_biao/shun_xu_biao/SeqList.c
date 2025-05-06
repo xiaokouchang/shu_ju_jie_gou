@@ -46,7 +46,7 @@ void SLPushBack(SL* ps, SLDataType x)
 			perror("realloc fail");
 			return;
 		}
-		ps->a = tmp;
+		ps->a = tmp;//不写这句代码的话是原地扩容,在原来的地址上增加
 		ps->capacity *= 2;
 	}
 	ps->a[ps->size++] = x;
@@ -55,3 +55,20 @@ void SLPushBack(SL* ps, SLDataType x)
 }
 
 
+//不释放空间,要释放空间只能一块一块释放
+void SLPopBack(SL* ps)
+{
+	//方法1
+	//assert(ps->size > 0);
+	//方法2
+	if (ps->size == 0)
+	{
+		return;
+	}
+	//ps->a[ps->size - 1] = 0;
+	ps->size--;
+}
+void SLPushFront(SL* s, SLDataType x)
+{
+
+}

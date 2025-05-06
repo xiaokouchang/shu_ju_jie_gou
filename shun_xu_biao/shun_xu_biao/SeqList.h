@@ -13,6 +13,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 #define INIT_CAPACITY 4         //初始化的容量
 typedef int SLDataType;
 //动态顺序表 --- 按需申请
@@ -29,6 +30,6 @@ void SLInit(SL* s);
 void SLDestory(SL* s);
 void SLPrint(SL* s);
 void SLPushBack(SL* s, SLDataType x);
-void SLPopBack(SL* s, SLDataType x);
+void SLPopBack(SL* s);
 void SLPushFront(SL* s, SLDataType x);
-void SLPopFront(SL* s, SLDataType x);
+void SLPopFront(SL* s);

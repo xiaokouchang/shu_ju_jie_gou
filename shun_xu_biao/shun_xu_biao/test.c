@@ -24,6 +24,9 @@ void TestSeqList1()
 	SLPushBack(&s, 3);
 	SLPushBack(&s, 4);
 	SLPushBack(&s, 5);
+	SLPushBack(&s, 6);
+	SLPushBack(&s, 7);
+	SLPopBack(&s);
 	SLPrint(&s);
 	SLDestory(&s);
 }
