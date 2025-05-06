@@ -24,13 +24,20 @@ void TestSeqList1()
 	SLPushBack(&s, 3);
 	SLPushBack(&s, 4);
 	SLPushBack(&s, 5);
-	SLPushBack(&s, 6);
-	SLPushBack(&s, 7);
-	SLPopBack(&s);
+	//头插N个数据的时间复杂度:O(N^2)
+	//尾插N个数据的时间复杂度:O(N)
+	SLPrint(&s);
+	SLInsert(&s, 3, 8);
 	SLPrint(&s);
 	SLDestory(&s);
+}
+void TestSeqList2()
+{
+	SL* s = NULL;
+	SLInit(&s);
 }
 int main()
 {
 	TestSeqList1();
+	//TestSeqList2();
 }

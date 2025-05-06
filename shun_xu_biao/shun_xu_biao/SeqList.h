@@ -26,10 +26,33 @@ typedef struct SeqList
 
 
 //增删查改
-void SLInit(SL* s);
-void SLDestory(SL* s);
-void SLPrint(SL* s);
-void SLPushBack(SL* s, SLDataType x);
-void SLPopBack(SL* s);
-void SLPushFront(SL* s, SLDataType x);
-void SLPopFront(SL* s);
+
+//初始化
+void SLInit(SL* ps);
+
+//释放空间
+void SLDestory(SL* ps);
+
+//输出
+void SLPrint(SL* ps);
+
+//扩容
+void SLCheckCapacity(SL* ps);
+
+//尾插
+void SLPushBack(SL* ps, SLDataType x);
+
+//尾删
+void SLPopBack(SL* ps);
+
+//头插
+void SLPushFront(SL* ps, SLDataType x);
+
+//头删
+void SLPopFront(SL* ps);
+
+//某个位置插入
+void SLInsert(SL* ps, int pos, SLDataType x);
+
+//某个位置删除
+void SLErase(SL* ps, int pos);
