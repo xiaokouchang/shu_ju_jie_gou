@@ -27,4 +27,22 @@ typedef struct SListNode
 //typedef struct SListNode STLNode;
 
 void SLTPrint(STLNode* phead);
-void SLPushBack(STLNode* phead, SLTDataType x);
+void SLTPushBack(STLNode** phead, SLTDataType x);
+void SLTPushFront(STLNode** pphead, SLTDataType x);
+
+void SLTPopBack(STLNode** phead);
+void SLTPopFront(STLNode** pphead);
+
+//单链表查找
+STLNode* SListFind(STLNode* pphead, SLTDataType x);
+
+//pos之前插入
+void SListInsert(STLNode** pphead, STLNode* pos, SLTDataType x);
+//pos位置删除
+void SListErase(STLNode** pphead, STLNode* pos);
+
+
+//pos后面插入
+void SListInsertAfter(STLNode* pos, SLTDataType x);
+//pos位置后面删除
+void SListEraseAfter(STLNode* pos);

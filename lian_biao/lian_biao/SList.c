@@ -18,30 +18,105 @@ void SLTPrint(STLNode* phead)
 	printf("NULL\n");
 }
 
-
-//上一个节点链接下一个节点的地址
-//原尾节点要存储新的尾节点的地址
-void SLPushBack(STLNode* phead, SLTDataType x)
+STLNode* BuySTLNode(SLTDataType x)
 {
 	STLNode* newnode = (STLNode*)malloc(sizeof(STLNode));
 	if (newnode == NULL)
 	{
 		perror("SLPushBack");
-		return;
+		return NULL;
 	}
 	newnode->data = x;
 	newnode->next = NULL;
-	//找尾
-	STLNode* tail = phead;
-	//错误
-	//while (tail != NULL)
-	//{
-	//	tail = tail->next;
-	//}
-	//tail = newnode;
-	while (tail->next != NULL)
-	{
-		tail = tail->next;
-	}
-	tail->next = newnode;
+	return newnode;
 }
+//上一个节点链接下一个节点的地址
+//不为空链表的尾插,尾插的本质是原尾节点要存储新的尾节点的地址
+void SLTPushBack(STLNode** pphead, SLTDataType x)
+{
+	STLNode* newnode = BuySTLNode(x);
+	if (*pphead == NULL)
+	{
+		*pphead = newnode;
+	}
+	else
+	{
+		//找尾
+		STLNode* tail = *pphead;
+		while (tail->next != NULL)
+		{
+			tail = tail->next;
+		}
+		tail->next = newnode;
+		//错误
+		//while (tail != NULL)
+		//{
+		//	tail = tail->next;
+		//}
+		//tail = newnode;
+	}
+}
+
+
+void SLTPushFront(STLNode** pphead, SLTDataType x)
+{
+	STLNode* newnode = BuySTLNode(x);
+	newnode->next = *pphead;
+	*pphead = newnode;
+}
+
+
+void SLTPopBack(STLNode** pphead)
+{
+	//必须有数据才能删除
+	//检查
+	assert(*pphead != NULL);
+	//if (*pphead == NULL)
+	//{
+	//	return;
+	//}
+	//只有一个节点
+	//有多个节点
+	if ((*pphead)->next == NULL)
+	{
+		free(*pphead);
+		*pphead = NULL;
+	}
+	else
+	{
+		//方法1
+		//找尾
+		STLNode* prev = NULL;
+		STLNode* tail = *pphead;
+		while (tail->next != NULL)
+		{
+			prev = tail;
+			tail = tail->next;
+		}
+		free(tail);
+		tail = NULL;
+		prev->next = NULL;
+		//方法2
+		//STLNode* tail = *pphead;
+		//while (tail->next->next != NULL)
+		//{
+		//	tail = tail->next;
+		//}
+		//free(tail->next);
+		//tail->next = NULL;
+	}
+}
+void SLTPopFront(STLNode** pphead)
+{
+	//检查
+	assert(*pphead != NULL);
+	//if (*pphead == NULL)
+	//{
+	//	return;
+	//}
+	STLNode* first = *pphead;
+	*pphead = first->next;
+	free(first);
+	first = NULL;
+}
+

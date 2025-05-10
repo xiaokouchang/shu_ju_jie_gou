@@ -10,3 +10,39 @@
 //链表
 //链表是一种物理存储结构上非连续、非顺序的存储结构
 //数据元素的逻辑顺序是通过链表中的指针链接次序实现的
+#include "SList.h"
+void TestSList1()
+{
+	STLNode* plist = NULL;
+	SLTPushBack(&plist, 1);
+	SLTPushBack(&plist, 2);
+	SLTPushBack(&plist, 3);
+	SLTPushBack(&plist, 4);
+	SLTPushFront(&plist, 4);
+	SLTPrint(plist);
+	SLTPopBack(&plist);
+	SLTPrint(plist);
+	SLTPopFront(&plist);
+	SLTPrint(plist);
+}
+void Func1(int* y)
+{
+	*y = 1;
+}
+void Func2(int** ptr)
+{
+	*ptr = (int*)malloc(sizeof(int));
+}
+int main()
+{
+	TestSList1();
+	int x = 0;
+	Func1(&x);
+	printf("%d\n", x);
+	int* px = NULL;
+	//改变的int*,使用int*的地址,int**指针
+	Func2(&px);
+	free(px);
+	px = NULL;
+	return 0;
+}
