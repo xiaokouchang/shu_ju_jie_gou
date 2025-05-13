@@ -34,15 +34,14 @@ void SLTPopBack(STLNode** phead);
 void SLTPopFront(STLNode** pphead);
 
 //单链表查找
-STLNode* SListFind(STLNode* pphead, SLTDataType x);
+STLNode* SLTFind(STLNode* pphead, SLTDataType x);
 
 //pos之前插入
-void SListInsert(STLNode** pphead, STLNode* pos, SLTDataType x);
+void SLTInsert(STLNode** pphead, STLNode* pos, SLTDataType x);
 //pos位置删除
-void SListErase(STLNode** pphead, STLNode* pos);
-
+void SLTErase(STLNode** pphead, STLNode* pos);
 
 //pos后面插入
-void SListInsertAfter(STLNode* pos, SLTDataType x);
+void SLTInsertAfter(STLNode* pos, SLTDataType x);
 //pos位置后面删除
-void SListEraseAfter(STLNode* pos);
+void SLTEraseAfter(STLNode* pos);
