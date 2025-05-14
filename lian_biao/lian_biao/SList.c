@@ -183,3 +183,54 @@ void SLTErase(STLNode** pphead, STLNode* pos)
 		pos = NULL;//可以不写,因为pos为形参
 	}
 }
+
+//pos后面插入
+void SLTInsertAfter(STLNode* pos, SLTDataType x)
+{
+	assert(pos);
+	STLNode* newnode = BuySTLNode(x);
+	newnode->next = pos->next;
+	pos->next = newnode;
+}
+//pos位置后面删除
+void SLTEraseAfter(STLNode* pos)
+{
+	assert(pos);
+	assert(pos->next);
+	//方法1
+	//STLNode * del = pos->next;
+	//pos->next = pos->next->next;
+	//free(del);
+	//del = NULL;
+	//方法2
+	STLNode * del = pos->next;
+	pos->next = del->next;
+	free(del);
+	del = NULL;
+}
+
+void SLTDestory1(STLNode* phead)
+{
+	STLNode* cur = phead;
+	while (cur)
+	{
+		//逐个释放结点
+		STLNode* next = cur->next;
+		free(cur);
+		cur = next;
+	}
+}
+
+void SLTDestory2(STLNode** pphead)
+{
+	assert(pphead);
+	STLNode* cur = *pphead;
+	while (cur)
+	{
+		//逐个释放结点
+		STLNode* next = cur->next;
+		free(cur);
+		cur = next;
+	}
+	*pphead = NULL;
+}

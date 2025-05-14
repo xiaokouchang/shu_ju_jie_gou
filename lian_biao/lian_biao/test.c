@@ -22,6 +22,7 @@ void TestSList1()
 	STLNode* ret = SLTFind(plist, 2);
 	SLTInsert(&plist, ret, 20);
 	SLTPrint(plist);
+	SLTDestory(&plist);
 }
 void Func1(int* y)
 {

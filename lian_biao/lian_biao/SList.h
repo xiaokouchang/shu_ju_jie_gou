@@ -45,3 +45,8 @@ void SLTErase(STLNode** pphead, STLNode* pos);
 void SLTInsertAfter(STLNode* pos, SLTDataType x);
 //pos位置后面删除
 void SLTEraseAfter(STLNode* pos);
+//链表销毁
+//方法1
+void SLTDestory1(STLNode* phead);
+//方法2
+void SLTDestory2(STLNode** pphead);
