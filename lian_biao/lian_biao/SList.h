@@ -1,11 +1,9 @@
 #pragma once
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
 //第一种写法
 typedef int SLTDataType;
-
 typedef struct SListNode
 {
 	SLTDataType data;
@@ -25,7 +23,7 @@ typedef struct SListNode
 //};
 //
 //typedef struct SListNode STLNode;
-
+STLNode* BuySTLNode(SLTDataType x);
 void SLTPrint(STLNode* phead);
 void SLTPushBack(STLNode** phead, SLTDataType x);
 void SLTPushFront(STLNode** pphead, SLTDataType x);
@@ -37,16 +35,26 @@ void SLTPopFront(STLNode** pphead);
 STLNode* SLTFind(STLNode* pphead, SLTDataType x);
 
 //pos之前插入
-void SLTInsert(STLNode** pphead, STLNode* pos, SLTDataType x);
+void SLTInsertFront(STLNode** pphead, STLNode* pos, SLTDataType x);
+
 //pos位置删除
 void SLTErase(STLNode** pphead, STLNode* pos);
 
 //pos后面插入
 void SLTInsertAfter(STLNode* pos, SLTDataType x);
+
 //pos位置后面删除
 void SLTEraseAfter(STLNode* pos);
+
 //链表销毁
 //方法1
 void SLTDestory1(STLNode* phead);
+
 //方法2
 void SLTDestory2(STLNode** pphead);
+
+void STLMiddlePos(int(*pf)(STLNode** pphead, SLTDataType x), STLNode** pphead, int num);
+
+
+void STLMiddlePush(int(*pf)(STLNode** pphead, SLTDataType x), STLNode** pphead);
+
