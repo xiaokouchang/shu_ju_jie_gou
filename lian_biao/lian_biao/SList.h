@@ -23,7 +23,7 @@ typedef struct SListNode
 //};
 //
 //typedef struct SListNode STLNode;
-STLNode* BuySTLNode(SLTDataType x);
+STLNode* BuySLTNode(SLTDataType x);
 void SLTPrint(STLNode* phead);
 void SLTPushBack(STLNode** phead, SLTDataType x);
 void SLTPushFront(STLNode** pphead, SLTDataType x);
@@ -58,3 +58,8 @@ void STLMiddlePos(int(*pf)(STLNode** pphead, SLTDataType x), STLNode** pphead, i
 
 void STLMiddlePush(int(*pf)(STLNode** pphead, SLTDataType x), STLNode** pphead);
 
+//从文件中加载
+void STLLoadSList(STLNode** pphead);
+
+//将链表保存到文件
+void STLSaveSList(STLNode** pphead);
