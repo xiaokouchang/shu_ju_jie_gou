@@ -16,7 +16,7 @@
 typedef int STDataType;
 typedef struct Stack
 {
-	int* a;
+	STDataType* a;
 	int top;
 	int capacity;   //ÈÝÁ¿
 }ST;

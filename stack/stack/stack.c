@@ -24,7 +24,6 @@ void STDestroy(ST* ps)
 	ps->top = 0;
 	ps->capacity = 0;
 }
-
 void STPush(ST* ps, STDataType x)
 {
 	assert(ps);

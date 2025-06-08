@@ -9,6 +9,7 @@ int main()
 	STPush(&st, 2);
 	STPush(&st, 3);
 	STPush(&st, 4);
+	//while(st.top != 0),不知道栈顶元素指向哪里
 	while (!STEmpty(&st))
 	{
 		printf("%d ", STTop(&st));
