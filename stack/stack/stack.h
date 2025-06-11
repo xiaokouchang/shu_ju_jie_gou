@@ -26,6 +26,8 @@ void STInit(ST* ps);
 
 void STDestroy(ST* ps);
 
+void STMiddle(void(*Pf)(ST* ps, STDataType x), ST* ps);
+
 //只能在一端插入,即栈顶
 void STPush(ST* ps,STDataType x);
 
@@ -37,3 +39,11 @@ bool STEmpty(ST* ps);
 
 //访问栈顶元素
 STDataType STTop(ST* ps);
+
+void STPrint(ST* ps);
+
+//保存栈中的元素到文件中
+void STSave(ST* ps);
+
+//从文件中加载
+void STLoad(ST* ps);
