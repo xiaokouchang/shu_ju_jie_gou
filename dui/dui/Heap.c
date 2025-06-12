@@ -19,7 +19,7 @@
 void HeapInit(HP* php)
 {
 	assert(php);
-	php->a = (HPDataType)malloc(sizeof(HPDataType) * 4);
+	php->a = (HPDataType*)malloc(sizeof(HPDataType) * 4);
 	if (php->a == NULL)
 	{
 		perror("malloc fail");
@@ -35,12 +35,13 @@ void Swap(HPDataType* p1, HPDataType* p2)
 	*p1 = *p2;
 	*p2 = tmp;
 }
+//除了child这个位置,前面的数据构成了堆
 void AdjustUP(HPDataType* a, int child)
 {
 	int parent = (child - 1) / 2;
-	while (parent >= 0)
+	while (child > 0)
 	{
-		if (a[child] > a[child])
+		if (a[child] > a[parent])
 		{
 			Swap(&a[child], &a[parent]);
 			child = parent;
@@ -58,7 +59,7 @@ void HeapPush(HP* php, HPDataType x)
 	assert(php);
 	if (php->capacity == php->size)
 	{
-		HPDataType* tmp = (HPDataType)realloc(php->a, sizeof(HPDataType) * php->capacity * 2);
+		HPDataType* tmp = (HPDataType*)realloc(php->a, sizeof(HPDataType) * php->capacity * 2);
 		if (tmp == NULL)
 		{
 			perror("realloc fail");
@@ -70,4 +71,62 @@ void HeapPush(HP* php, HPDataType x)
 	php->a[php->size] = x;
 	php->size++;
 	AdjustUP(php->a, php->size - 1);
+}
+//左右子树都是大堆/小堆
+void AdjustDown(HPDataType* a, int n, int parent)
+{
+	//最坏log2N(堆的高度)
+	int child = parent * 2 + 1;
+	while (child < n)
+	{
+		//选出左右孩子中大的那一个
+		if (child + 1 < n && a[child + 1] > a[child])
+		{
+			child++;
+		}
+		if (a[child] > a[parent])
+		{
+			Swap(&a[child], &a[parent]);
+			parent = child;
+			child = parent * 2 + 1;
+		}
+		else
+		{
+			break;
+		}
+	}
+}
+
+void HeapPop(HP* php)
+{
+	assert(!HeapEmpty(php));
+	assert(php);
+	//删除数据
+	Swap(&php->a[0], &php->a[php->size - 1]);
+	php->size--;
+	AdjustDown(php->a, php->size, 0);
+}
+
+HPDataType HeapTop(HP* php)
+{
+	assert(php);
+	return php->a[0];
+}
+
+int HeapSize(HP* php)
+{
+	assert(php);
+	return php->size;
+}
+
+bool HeapEmpty(HP* php)
+{
+	assert(php);
+	return php->size == 0;
+}
+
+
+void HeapDestory(HP* php)
+{
+
 }
