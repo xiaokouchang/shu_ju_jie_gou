@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
+#include "Queue.h"
 typedef int BTDataType;
 typedef struct BinaryTreeNode
 {
@@ -97,6 +98,34 @@ void PostOrder(BTNode* root)
 	PostOrder(root->right);
 	printf("%d ", root->data);
 }
+
+
+//查找二叉树值为x的结点
+//返回结点指针既有查找的功能,也有修改的功能
+BTNode* BinaryTreeFind(BTNode* root, BTDataType x)
+{
+	if (root == NULL)
+	{
+		return NULL;
+	}
+	if (root->data == x)
+	{
+		return root;
+	}
+	BTNode* lret = BinaryTreeFind(root->left, x);
+	if (lret)
+	{
+		return lret;
+	}
+	BTNode* rret = BinaryTreeFind(root->right, x);
+	if (rret)
+	{
+		return rret;
+	}
+	return NULL;
+}
+
+
 //顺序影响执行逻辑
 //方法1
 //void Treesize(BTNode* root, int* size)
@@ -149,6 +178,37 @@ int TreeLevel(BTNode* root, int k)
 	return TreeLevel(root->left, k - 1) +
 		TreeLevel(root->right, k - 1);
 }
+//使用队列
+//层序遍历
+void LeverIOrder(BTNode* root)
+{
+	Queue q;
+	QueueInit(&q);
+	if (root)
+	{
+		QueuePush(&q, root);
+	}
+	while (!QueueEmpty(&q))
+	{
+		BTNode* front = QueueFront(&q);
+		QueuePop(&q);//Pop的是队列的节点,front保存的是树的节点
+		printf("%d ", front->data);
+		if (front->left)
+		{
+			QueuePush(&q, front->left);
+		}
+		if (front->right)
+		{
+			QueuePush(&q, front->right);
+		}
+	}
+	QueueDestory(&q);
+}
+//判断完全二叉树
+int BinaryTreeComplete(BTNode* root)
+{
+
+}
 int main()
 {
 	BTNode* root = CreatTree();
@@ -166,5 +226,7 @@ int main()
 	//printf("Treesize:%d\n", ret);
 	int ret = TreeLevel(root, 3);
 	printf("Treesize:%d\n", ret);
+	//BTNode* ret = BinaryTreeFind(root, 2);
+
 	return 0;
 }
