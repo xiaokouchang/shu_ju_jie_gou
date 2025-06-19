@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>排序算法可视化</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3B82F6',
+                        secondary: '#10B981',
+                        accent: '#8B5CF6',
+                        neutral: '#1F2937',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-transform-opacity {
+                transition-property: transform, opacity;
+            }
+            .animation-delay-100 {
+                animation-delay: 100ms;
+            }
+            .animation-delay-200 {
+                animation-delay: 200ms;
+            }
+            .animation-delay-300 {
+                animation-delay: 300ms;
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-neutral min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-primary to-accent text-white shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <h1 class="text-[clamp(1.8rem,4vw,2.5rem)] font-bold flex items-center">
+                <i class="fa fa-sort-numeric-asc mr-3"></i>排序算法可视化工具
+            </h1>
+            <p class="text-lg mt-2 opacity-90">交互式展示8种经典排序算法的执行过程</p>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-bold mb-4 flex items-center">
+                    <i class="fa fa-sliders mr-2 text-primary"></i>控制面板
+                </h2>
+                
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">选择排序算法</label>
+                        <select id="algorithm-select" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/50 focus:border-primary transition">
+                            <option value="bubble">冒泡排序 (Bubble Sort)</option>
+                            <option value="selection">选择排序 (Selection Sort)</option>
+                            <option value="insertion">插入排序 (Insertion Sort)</option>
+                            <option value="shell">希尔排序 (Shell Sort)</option>
+                            <option value="merge">归并排序 (Merge Sort)</option>
+                            <option value="quick">快速排序 (Quick Sort)</option>
+                            <option value="heap">堆排序 (Heap Sort)</option>
+                            <option value="radix">基数排序 (Radix Sort)</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">数组大小</label>
+                        <div class="flex items-center">
+                            <input type="range" id="array-size" min="10" max="100" value="30" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
+                            <span id="array-size-value" class="ml-3 min-w-[3rem] text-center">30</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">排序速度</label>
+                        <div class="flex items-center">
+                            <input type="range" id="sort-speed" min="10" max="500" value="100" 
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-primary">
+                            <span id="sort-speed-value" class="ml-3 min-w-[3rem] text-center">100ms</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button id="randomize-btn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-neutral font-medium py-2 px-4 rounded-lg transition flex items-center justify-center">
+                            <i class="fa fa-random mr-2"></i>随机数组
+                        </button>
+                        <button id="sort-btn" class="flex-1 bg-primary hover:bg-primary/90 text-white font-medium py-2 px-4 rounded-lg transition flex items-center justify-center">
+                            <i class="fa fa-play mr-2"></i>开始排序
+                        </button>
+                    </div>
+                    
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <h3 class="font-medium text-gray-800 mb-2">算法信息</h3>
+                        <div id="algorithm-info" class="text-sm text-gray-600">
+                            <p><strong>冒泡排序</strong></p>
+                            <p class="mt-1">时间复杂度: O(n²)</p>
+                            <p class="mt-1">空间复杂度: O(1)</p>
+                            <p class="mt-1">稳定性: 稳定</p>
+                            <p class="mt-1">原理: 重复遍历要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-2 bg-white rounded-xl shadow-md p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold flex items-center">
+                        <i class="fa fa-bar-chart mr-2 text-primary"></i>排序过程可视化
+                    </h2>
+                    <div class="flex space-x-2">
+                        <span id="comparisons" class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                            比较次数: 0
+                        </span>
+                        <span id="swaps" class="bg-gray-100 text-gray-800 px-3 py-1 rounded-full text-sm font-medium">
+                            交换次数: 0
+                        </span>
+                    </div>
+                </div>
+                
+                <div id="visualization-container" class="flex-1 min-h-[400px] bg-gray-50 rounded-lg border border-gray-200 p-4 relative">
+                    <div id="array-container" class="w-full h-full flex items-end justify-center space-x-[0.5%]">
+                        <!-- 数组元素将在这里动态生成 -->
+                    </div>
+                    <div id="status-message" class="absolute top-4 right-4 bg-white/80 backdrop-blur-sm text-neutral font-medium px-3 py-1 rounded-full text-sm shadow-md">
+                        准备就绪
+                    </div>
+                </div>
+                
+                <div class="mt-6 bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <h3 class="font-medium text-gray-800 mb-2">排序步骤</h3>
+                    <div id="step-log" class="text-sm text-gray-600 max-h-40 overflow-y-auto">
+                        <!-- 排序步骤将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-bold mb-4 flex items-center">
+                <i class="fa fa-book mr-2 text-primary"></i>排序算法对比
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">算法</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时间复杂度(平均)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">时间复杂度(最坏)</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">空间复杂度</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">稳定性</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">冒泡排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(1)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">稳定</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">选择排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(1)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">不稳定</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">插入排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(1)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">稳定</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">希尔排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(1)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">不稳定</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">归并排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">稳定</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">快速排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n²)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">不稳定</td>
+                        </tr>
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">堆排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n log n)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(1)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">不稳定</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">基数排序</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(nk)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(nk)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">O(n+k)</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600">稳定</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-neutral text-white py-6 mt-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h2 class="text-xl font-bold">排序算法可视化工具</h2>
+                    <p class="text-gray-400 mt-1">交互式学习经典排序算法</p>
+                </div>
+                <div class="flex space-x-4">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fa fa-github text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fa fa-twitter text-xl"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i class="fa fa-linkedin text-xl"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="mt-6 pt-6 border-t border-gray-700 text-center text-gray-400 text-sm">
+                &copy; 2025 排序算法可视化工具 | 用代码理解算法
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM元素
+        const arrayContainer = document.getElementById('array-container');
+        const randomizeBtn = document.getElementById('randomize-btn');
+        const sortBtn = document.getElementById('sort-btn');
+        const algorithmSelect = document.getElementById('algorithm-select');
+        const arraySizeInput = document.getElementById('array-size');
+        const arraySizeValue = document.getElementById('array-size-value');
+        const sortSpeedInput = document.getElementById('sort-speed');
+        const sortSpeedValue = document.getElementById('sort-speed-value');
+        const comparisonsCounter = document.getElementById('comparisons');
+        const swapsCounter = document.getElementById('swaps');
+        const statusMessage = document.getElementById('status-message');
+        const stepLog = document.getElementById('step-log');
+        const algorithmInfo = document.getElementById('algorithm-info');
+
+        // 全局变量
+        let array = [];
+        let isSorting = false;
+        let comparisons = 0;
+        let swaps = 0;
+        let animationSpeed = 100; // 默认动画速度（毫秒）
+
+        // 算法信息映射
+        const algorithmInfoMap = {
+            bubble: {
+                name: '冒泡排序',
+                timeComplexity: 'O(n²)',
+                spaceComplexity: 'O(1)',
+                stability: '稳定',
+                description: '重复遍历要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。'
+            },
+            selection: {
+                name: '选择排序',
+                timeComplexity: 'O(n²)',
+                spaceComplexity: 'O(1)',
+                stability: '不稳定',
+                description: '在未排序序列中找到最小（大）元素，存放到排序序列的起始位置，然后，再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。'
+            },
+            insertion: {
+                name: '插入排序',
+                timeComplexity: 'O(n²)',
+                spaceComplexity: 'O(1)',
+                stability: '稳定',
+                description: '将未排序数据插入到已排序序列的合适位置。类似于打扑克牌时整理手牌的过程。'
+            },
+            shell: {
+                name: '希尔排序',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(1)',
+                stability: '不稳定',
+                description: '改进的插入排序，它会优先比较距离较远的元素，缩小增量后再进行插入排序，减少元素移动次数。'
+            },
+            merge: {
+                name: '归并排序',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(n)',
+                stability: '稳定',
+                description: '采用分治法，将数组分成两个子数组，分别对两个子数组进行排序，然后将排好序的子数组合并成一个最终的有序数组。'
+            },
+            quick: {
+                name: '快速排序',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(log n)',
+                stability: '不稳定',
+                description: '选择一个基准值，将数组分为两部分，小于基准值的元素放在左边，大于基准值的元素放在右边，然后递归地对两部分进行排序。'
+            },
+            heap: {
+                name: '堆排序',
+                timeComplexity: 'O(n log n)',
+                spaceComplexity: 'O(1)',
+                stability: '不稳定',
+                description: '利用堆这种数据结构所设计的一种排序算法，它的基本思想是将待排序序列构造成一个大顶堆，此时，整个序列的最大值就是堆顶的根节点。将其与末尾元素进行交换，此时末尾就为最大值。然后将剩余n-1个元素重新构造成一个堆，这样会得到n个元素的次小值。如此反复执行，便能得到一个有序序列。'
+            },
+            radix: {
+                name: '基数排序',
+                timeComplexity: 'O(nk)',
+                spaceComplexity: 'O(n+k)',
+                stability: '稳定',
+                description: '按照低位先排序，然后收集；再按照高位排序，然后再收集；依次类推，直到最高位。有时候有些属性是有优先级顺序的，先按低优先级排序，再按高优先级排序。最后的次序就是高优先级高的在前，高优先级相同的低优先级高的在前。'
+            }
+        };
+
+        // 初始化
+        function init() {
+            updateAlgorithmInfo();
+            randomizeArray();
+            setupEventListeners();
+        }
+
+        // 设置事件监听器
+        function setupEventListeners() {
+            randomizeBtn.addEventListener('click', randomizeArray);
+            sortBtn.addEventListener('click', startSorting);
+            algorithmSelect.addEventListener('change', updateAlgorithmInfo);
+            arraySizeInput.addEventListener('input', updateArraySize);
+            sortSpeedInput.addEventListener('input', updateSortSpeed);
+        }
+
+        // 更新算法信息
+        function updateAlgorithmInfo() {
+            const selectedAlgorithm = algorithmSelect.value;
+            const info = algorithmInfoMap[selectedAlgorithm];
+            
+            algorithmInfo.innerHTML = `
+                <p><strong>${info.name}</strong></p>
+                <p class="mt-1">时间复杂度: ${info.timeComplexity}</p>
+                <p class="mt-1">空间复杂度: ${info.spaceComplexity}</p>
+                <p class="mt-1">稳定性: ${info.stability}</p>
+                <p class="mt-1">原理: ${info.description}</p>
+            `;
+        }
+
+        // 更新数组大小
+        function updateArraySize() {
+            const size = parseInt(arraySizeInput.value);
+            arraySizeValue.textContent = size;
+            randomizeArray();
+        }
+
+        // 更新排序速度
+        function updateSortSpeed() {
+            animationSpeed = parseInt(sortSpeedInput.value);
+            sortSpeedValue.textContent = `${animationSpeed}ms`;
+        }
+
+        // 生成随机数组
+        function randomizeArray() {
+            if (isSorting) return;
+            
+            const size = parseInt(arraySizeInput.value);
+            array = [];
+            
+            for (let i = 0; i < size; i++) {
+                // 生成1到100之间的随机数
+                array.push(Math.floor(Math.random() * 100) + 1);
+            }
+            
+            renderArray();
+            resetCounters();
+            clearStepLog();
+            setStatus('准备就绪');
+        }
+
+        // 渲染数组
+        function renderArray(activeIndices = [], sortedIndices = []) {
+            arrayContainer.innerHTML = '';
+            
+            array.forEach((value, index) => {
+                const bar = document.createElement('div');
+                const isActive = activeIndices.includes(index);
+                const isSorted = sortedIndices.includes(index);
+                
+                bar.className = `bg-primary transition-all duration-200 rounded-t-md 
+                                ${isActive ? 'bg-accent transform scale-y-110' : ''}
+                                ${isSorted ? 'bg-secondary' : ''}`;
+                bar.style.height = `${value * 3}px`;
+                bar.style.width = `${90 / array.length}%`;
+                
+                const label = document.createElement('div');
+                label.className = 'text-xs text-center mt-1 text-gray-600';
+                label.textContent = value;
+                
+                bar.appendChild(label);
+                arrayContainer.appendChild(bar);
+            });
+        }
+
+        // 重置计数器
+        function resetCounters() {
+            comparisons = 0;
+            swaps = 0;
+            updateCounters();
+        }
+
+        // 更新计数器显示
+        function updateCounters() {
+            comparisonsCounter.textContent = `比较次数: ${comparisons}`;
+            swapsCounter.textContent = `交换次数: ${swaps}`;
+        }
+
+        // 设置状态消息
+        function setStatus(message) {
+            statusMessage.textContent = message;
+        }
+
+        // 添加步骤日志
+        function addStepLog(message) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'py-1 border-b border-gray-100 last:border-0';
+            logEntry.textContent = message;
+            stepLog.appendChild(logEntry);
+            stepLog.scrollTop = stepLog.scrollHeight;
+        }
+
+        // 清空步骤日志
+        function clearStepLog() {
+            stepLog.innerHTML = '';
+        }
+
+        // 交换数组元素
+        function swap(arr, i, j) {
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+            swaps++;
+            updateCounters();
+        }
+
+        // 比较函数
+        function compare(arr, i, j) {
+            comparisons++;
+            updateCounters();
+            return arr[i] - arr[j];
+        }
+
+        // 延迟函数
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // 开始排序
+        async function startSorting() {
+            if (isSorting) return;
+            
+            isSorting = true;
+            sortBtn.disabled = true;
+            randomizeBtn.disabled = true;
+            algorithmSelect.disabled = true;
+            arraySizeInput.disabled = true;
+            
+            setStatus('排序中...');
+            clearStepLog();
+            addStepLog(`开始${algorithmInfoMap[algorithmSelect.value].name}排序`);
+            
+            const start = performance.now();
+            
+            switch (algorithmSelect.value) {
+                case 'bubble':
+                    await bubbleSort();
+                    break;
+                case 'selection':
+                    await selectionSort();
+                    break;
+                case 'insertion':
+                    await insertionSort();
+                    break;
+                case 'shell':
+                    await shellSort();
+                    break;
+                case 'merge':
+                    await mergeSort(0, array.length - 1);
+                    break;
+                case 'quick':
+                    await quickSort(0, array.length - 1);
+                    break;
+                case 'heap':
+                    await heapSort();
+                    break;
+                case 'radix':
+                    await radixSort();
+                    break;
+            }
+            
+            const end = performance.now();
+            const timeTaken = (end - start).toFixed(2);
+            
+            setStatus('排序完成');
+            addStepLog(`排序完成，耗时 ${timeTaken} 毫秒`);
+            
+            // 高亮显示已排序的数组
+            renderArray([], array.map((_, i) => i));
+            
+            isSorting = false;
+            sortBtn.disabled = false;
+            randomizeBtn.disabled = false;
+            algorithmSelect.disabled = false;
+            arraySizeInput.disabled = false;
+        }
+
+        // 冒泡排序
+        async function bubbleSort() {
+            const len = array.length;
+            let swapped;
+            
+            for (let i = 0; i < len - 1; i++) {
+                swapped = false;
+                
+                for (let j = 0; j < len - i - 1; j++) {
+                    renderArray([j, j + 1], array.slice(len - i));
+                    addStepLog(`比较索引 ${j} (${array[j]}) 和 ${j+1} (${array[j+1]})`);
+                    await delay(animationSpeed);
+                    
+                    if (compare(array, j, j + 1) > 0) {
+                        swap(array, j, j + 1);
+                        renderArray([j, j + 1], array.slice(len - i));
+                        addStepLog(`交换 ${array[j+1]} 和 ${array[j]}`);
+                        await delay(animationSpeed);
+                        swapped = true;
+                    }
+                }
+                
+                if (!swapped) break;
+            }
+            
+            // 标记所有元素为已排序
+            renderArray([], array.map((_, i) => i));
+        }
+
+        // 选择排序
+        async function selectionSort() {
+            const len = array.length;
+            
+            for (let i = 0; i < len - 1; i++) {
+                let minIndex = i;
+                
+                for (let j = i + 1; j < len; j++) {
+                    renderArray([minIndex, j], array.slice(0, i));
+                    addStepLog(`比较索引 ${minIndex} (${array[minIndex]}) 和 ${j} (${array[j]})`);
+                    await delay(animationSpeed);
+                    
+                    if (compare(array, j, minIndex) < 0) {
+                        minIndex = j;
+                        renderArray([minIndex, j], array.slice(0, i));
+                        addStepLog(`更新最小值索引为 ${minIndex}`);
+                        await delay(animationSpeed);
+                    }
+                }
+                
+                if (minIndex !== i) {
+                    swap(array, i, minIndex);
+                    renderArray([i, minIndex], array.slice(0, i + 1));
+                    addStepLog(`交换 ${array[minIndex]} 和 ${array[i]}`);
+                    await delay(animationSpeed);
+                }
+            }
+            
+            // 标记所有元素为已排序
+            renderArray([], array.map((_, i) => i));
+        }
+
+        // 插入排序
+        async function insertionSort() {
+            const len = array.length;
+            
+            for (let i = 1; i < len; i++) {
+                let j = i;
+                const current = array[i];
+                
+                renderArray([i, j - 1], array.slice(0, i));
+                addStepLog(`当前元素: ${current}，比较 ${current} 和 ${array[j-1]}`);
+                await delay(animationSpeed);
+                
+                while (j > 0 && compare(array, j - 1, j) > 0) {
+                    array[j] = array[j - 1];
+                    swaps++; // 赋值操作也视为一次交换
+                    updateCounters();
+                    
+                    j--;
+                    renderArray([j, j - 1], array.slice(0, i));
+                    addStepLog(`移动 ${array[j]} 到位置 ${j+1}`);
+                    await delay(animationSpeed);
+                }
+                
+                array[j] = current;
+                swaps++; // 赋值操作也视为一次交换
+                updateCounters();
+                
+                renderArray([j], array.slice(0, i + 1));
+                addStepLog(`插入 ${current} 到位置 ${j}`);
+                await delay(animationSpeed);
+            }
+            
+            // 标记所有元素为已排序
+            renderArray([], array.map((_, i) => i));
+        }
+
+        // 希尔排序
+        async function shellSort() {
+            const len = array.length;
+            let gap = Math.floor(len / 2);
+            
+            while (gap > 0) {
+                addStepLog(`当前间隔: ${gap}`);
+                
+                for (let i = gap; i < len; i++) {
+                    let j = i;
+                    const temp = array[i];
+                    
+                    renderArray([i, j - gap], []);
+                    addStepLog(`比较索引 ${j} (${array[j]}) 和 ${j-gap} (${array[j-gap]})`);
+                    await delay(animationSpeed);
+                    
+                    while (j >= gap && compare(array, j - gap, j) > 0) {
+                        array[j] = array[j - gap];
+                        swaps++;
+                        updateCounters();
+                        
+                        j -= gap;
+                        renderArray([j, j - gap], []);
+                        addStepLog(`移动 ${array[j]} 到位置 ${j+gap}`);
+                        await delay(animationSpeed);
+                    }
+                    
+                    array[j] = temp;
+                    swaps++;
+                    updateCounters();
+                    
+                    renderArray([j], []);
+                    addStepLog(`插入 ${temp} 到位置 ${j}`);
+                    await delay(animationSpeed);
+                }
+                
+                gap = Math.floor(gap / 2);
+            }
+            
+            // 标记所有元素为已排序
+            renderArray([], array.map((_, i) => i));
+        }
+
+        // 归并排序
+        async function mergeSort(left, right) {
+            if (left < right) {
+                const mid = Math.floor((left + right) / 2);
+                
+                await mergeSort(left, mid);
+                await mergeSort(mid + 1, right);
+                await merge(left, mid, right);
+            }
+        }
+
+        // 归并函数
+        async function merge(left, mid, right) {
+            const n1 = mid - left + 1;
+            const n2 = right - mid;
+            
+            const L = new Array(n1);
+            const R = new Array(n2);
+            
+            for (let i = 0; i < n1; i++) {
+                L[i] = array[left + i];
+            }
+            
+            for (let j = 0; j < n2; j++) {
+                R[j] = array[mid + 1 + j];
+            }
+            
+            let i = 0;
+            let j = 0;
+            let k = left;
+            
+            while (i < n1 && j < n2) {
+                renderArray([left + i, mid + 1 + j], []);
+                addStepLog(`比较 ${L[i]} 和 ${R[j]}`);
+                await delay(animationSpeed);
+                
+                if (L[i] <= R[j]) {
+                    array[k] = L[i];
+                    swaps++;
+                    updateCounters();
+                    i++;
+                } else {
+                    array[k] = R[j];
+                    swaps++;
+                    updateCounters();
+                    j++;
+                }
+                
+                renderArray([k], []);
+                addStepLog(`将 ${array[k]} 放入位置 ${k}`);
+                await delay(animationSpeed);
+                k++;
+            }
+            
+            while (i < n1) {
+                array[k] = L[i];
+                swaps++;
+                updateCounters();
+                renderArray([k], []);
+                addStepLog(`将 ${array[k]} 放入位置 ${k}`);
+                await delay(animationSpeed);
+                i++;
+                k++;
+            }
+            
+            while (j < n2) {
+                array[k] = R[j];
+                swaps++;
+                updateCounters();
+                renderArray([k], []);
+                addStepLog(`将 ${array[k]} 放入位置 ${k}`);
+                await delay(animationSpeed);
+                j++;
+                k++;
+            }
+            
+            // 标记当前合并的部分为已排序
+            const sortedIndices = [];
+            for (let idx = left; idx <= right; idx++) {
+                sortedIndices.push(idx);
+            }
+            renderArray([], sortedIndices);
+        }
+
+        // 快速排序
+        async function quickSort(left, right) {
+            if (left < right) {
+                const pivotIndex = await partition(left, right);
+                await quickSort(left, pivotIndex - 1);
+                await quickSort(pivotIndex + 1, right);
+            }
+        }
+
+        // 分区函数
+        async function partition(left, right) {
+            const pivot = array[right];
+            let i = left - 1;
+            
+            renderArray([right], []);
+            addStepLog(`选择基准值: ${pivot} (索引 ${right})`);
+            await delay(animationSpeed);
+            
+            for (let j = left; j < right; j++) {
+                renderArray([j, i + 1, right], []);
+                addStepLog(`比较 ${array[j]} 和基准值 ${pivot}`);
+                await delay(animationSpeed);
+                
+                if (compare(array, j, right) <= 0) {
+                    i++;
+                    swap(array, i, j);
+                    renderArray([i, j, right], []);
+                    addStepLog(`交换 ${array[i]} 和 ${array[j]}`);
+                    await delay(animationSpeed);
+                }
+            }
+            
+            swap(array, i + 1, right);
+            renderArray([i + 1, right], []);
+            addStepLog(`将基准值 ${pivot} 放到正确位置 ${i+1}`);
+            await delay(animationSpeed);
+            
+            return i + 1;
+        }
+
+        // 堆排序
+        async function heapSort() {
+            const len = array.length;
+            
+            // 构建最大堆
+            for (let i = Math.floor(len / 2) - 1; i >= 0; i--) {
+                await heapify(len, i);
+            }
+            
+            // 一个个从堆中取出元素
+            for (let i = len - 1; i > 0; i--) {
+                swap(array, 0, i);
+                renderArray([0, i], array.slice(i));
+                addStepLog(`交换堆顶元素 ${array[i]} 和末尾元素 ${array[0]}`);
+                await delay(animationSpeed);
+                
+                await heapify(i, 0);
+            }
+            
+            // 标记所有元素为已排序
+            renderArray([], array.map((_, i) => i));
+        }
+
+        // 堆化函数
+        async function heapify(n, i) {
+            let largest = i;
+            const left = 2 * i + 1;
+            const right = 2 * i + 2;
+            
+            if (left < n) {
+                renderArray([largest, left], []);
+                addStepLog(`比较父节点 ${array[largest]} (索引 ${largest}) 和左子节点 ${array[left]} (索引 ${left})`);
+                await delay(animationSpeed);
+                
+                if (compare(array, left, largest) > 0) {
+                    largest = left;
+                    addStepLog(`更新最大节点索引为 ${largest}`);
+                }
+            }
+            
+            if (right < n) {
+                renderArray([largest, right], []);
+                addStepLog(`比较父节点 ${array[largest]} (索引 ${largest}) 和右子节点 ${array[right]} (索引 ${right})`);
+                await delay(animationSpeed);
+                
+                if (compare(array, right, largest) > 0) {
+                    largest = right;
+                    addStepLog(`更新最大节点索引为 ${largest}`);
+                }
+            }
+            
+            if (largest !== i) {
+                swap(array, i, largest);
+                renderArray([i, largest], []);
+                addStepLog(`交换 ${array[i]} 和 ${array[largest]}`);
+                await delay(animationSpeed);
+                
+                await heapify(n, largest);
+            }
+        }
+
+        // 基数排序
+        async function radixSort() {
+            if (array.length === 0) return;
+            
+            // 找到最大值确定位数
+            const maxNum = Math.max(...array);
+            const maxDigits = Math.floor(Math.log10(maxNum)) + 1;
+            
+            for (let i = 0; i < maxDigits; i++) {
+                addStepLog(`第 ${i+1} 轮排序（按${Math.pow(10, i)}位）`);
+                await countingSortForRadix(i);
+            }
+            
+            // 标记所有元素为已排序
+            renderArray([], array.map((_, i) => i));
+        }
+
+        // 基数排序的计数排序辅助函数
+        async function countingSortForRadix(exp) {
+            const output = new Array(array.length);
+            const count = new Array(10).fill(0);
+            const base = 10;
+            
+            // 计算每个数字出现的次数
+            for (let i = 0; i < array.length; i++) {
+                const digit = Math.floor(array[i] / Math.pow(base, exp)) % base;
+                count[digit]++;
+            }
+            
+            // 计算累积次数
+            for (let i = 1; i < 10; i++) {
+                count[i] += count[i - 1];
+            }
+            
+            // 构建输出数组
+            for (let i = array.length - 1; i >= 0; i--) {
+                const digit = Math.floor(array[i] / Math.pow(base, exp)) % base;
+                output[count[digit] - 1] = array[i];
+                count[digit]--;
+                
+                // 可视化当前步骤
+                renderArray([i], []);
+                addStepLog(`将 ${array[i]} 放入位置 ${count[digit]}`);
+                await delay(animationSpeed);
+            }
+            
+            // 复制回原数组
+            for (let i = 0; i < array.length; i++) {
+                array[i] = output[i];
+                renderArray([i], []);
+                addStepLog(`更新位置 ${i} 为 ${array[i]}`);
+                await delay(animationSpeed);
+            }
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>    
