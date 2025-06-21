@@ -15,13 +15,13 @@ void TestInsert()
 	//ShellSort(a, sz);
 	//SelectSort(a, sz);
 	//HeapSort(a, sz);
-	QuickSort(a, 0, sz - 1);
+	QuickSort1(a, 0, sz - 1);
 	PrintArray(a, sz);
 }
 void TestOP()
 {
 	srand(time(0));
-	const int N = 10000;
+	const int N = 1000000;
 	int* a1 = (int*)malloc(sizeof(int) * N);
 	int* a2 = (int*)malloc(sizeof(int) * N);
 	int* a3 = (int*)malloc(sizeof(int) * N);
@@ -31,6 +31,7 @@ void TestOP()
 	int* a7 = (int*)malloc(sizeof(int) * N);
 	for (int i = 0; i < N; i++)
 	{
+		//a1[i] = i;
 		a1[i] = rand();
 		a2[i] = a1[i];
 		a3[i] = a1[i];
@@ -52,7 +53,7 @@ void TestOP()
 	HeapSort(a4, N);
 	int end4 = clock();
 	int begin5 = clock();
-	QuickSort(a5, 0, N - 1);
+	QuickSort2(a5, 0, N - 1);
 	int end5 = clock();
 	int begin6 = clock();
 	//MergeSort(a6, N);
@@ -76,7 +77,7 @@ void TestOP()
 }
 int main()
 {
-	TestOP();
-	//TestInsert();
+	//TestOP();
+	TestInsert();
 	return 0;
 }

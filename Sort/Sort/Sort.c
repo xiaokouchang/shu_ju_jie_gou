@@ -188,8 +188,17 @@ void SelectSort(int* a, int n)
 		right--;
 	}
 }
-int partion(int* a, int left, int right)
+int PartSort1(int* a, int left, int right)
 {
+	//随机选keyi
+	//int randi = left + (rand() % (right - left));
+	//Swap(&a[left], &a[randi]);
+	//三数取中(有序)---开始中间最后三个数中选不是最小也不是最大的数
+	int midi = GetMidNumi(a, left, right);
+	if (midi != left)
+	{
+		Swap(&a[midi], &a[left]);
+	}
 	int keyi = left;
 	while (left < right)
 	{
@@ -209,25 +218,132 @@ int partion(int* a, int left, int right)
 	keyi = left;
 	return keyi;
 }
+int PartSort2(int* a, int left, int right)
+{
+	int key = a[left];
+	int hole = left;
+	while (left < right)
+	{
+		while (left < right && a[right] >= key)
+		{
+			right--;
+		}
+		a[hole] = a[right];
+		hole = right;
+		while (left < right && a[left] <= key)
+		{
+			left++;
+		}
+		a[hole] = a[left];
+		hole = left;
+	}
+	a[hole] = key;
+	return hole;
+}
+int PartSort3(int* a, int left, int right)
+{
+	//左闭右闭
+	int keyi = left;
+	int prev = left;
+	int cur = left + 1;
+	while (cur <= right)
+	{
+		if (a[cur] <= a[keyi] && ++prev != cur)
+		{
+			Swap(&a[prev], &a[cur]);
+		}
+		cur++;
+	}
+	Swap(&a[prev], &a[keyi]);
+	keyi = prev;
+	return prev;
+}
 //有序都很坏
 //keyi越接近中间值,效率越高
-void QuickSort(int* a, int left, int right)
+int GetMidNumi(int* a, int left, int right)
+{
+	//三目操作符可读性差
+	int mid = (left + right) / 2;
+	if (a[left] < a[mid])
+	{
+		if (a[mid] < a[right])
+		{
+			return mid;
+		}
+		else if(a[left] > a[right])
+		{
+			return left;
+		}
+		else
+		{
+			return right;
+		}
+	}
+	else  //(a[left] > a[mid])
+	{
+		if (a[mid] > a[right])
+		{
+			return mid;
+		}
+		else if (a[left] < a[right])
+		{
+			return left;
+		}
+		else
+		{
+			return right;
+		}
+	}
+}
+//时间复杂度:O(N*log2(N))
+//左边做keyi,右边先走,保证相遇位置比keyi要小或者就是key的位置
+//相遇:
+//R找小,L没有找到大,L遇到R
+//R找小,找不到,直接跟L相遇了,要么就是一个比key小的位置或者直接到keyi
+//R找小,L没有找到大,L遇到R
+//类似道理,右边做key,左边先走,相遇位置就比key要大
+//hoare版本
+void QuickSort1(int* a, int left, int right)
 {
 	if (left >= right)
 	{
 		return;
 	}
-	//随机选keyi
-	int randi = left + (rand() % (right - left));
-	Swap(&a[left], &a[randi]);
 	//按照基准值对array数组的[left, right)区间中的元素进行划分
-	int div = partion(a, left, right);
+	int div = PartSort1(a, left, right);
 	//划分成功后以div为边界形成了左右两部分[left, div)和[div+1, right)
 	//类似于倒立的二叉树
 	//递归排[left, div)
-	QuickSort(a, left, div);
+	QuickSort1(a, left, div - 1);
 	//递归排[div+1, right)
-	QuickSort(a, div + 1, right);
+	QuickSort1(a, div + 1, right);
+}
+void QuickSort2(int* a, int left, int right)
+{
+	if (left >= right)
+	{
+		return;
+	}
+	int div = PartSort2(a, left, right);
+	QuickSort2(a, left, div - 1);
+	QuickSort2(a, div + 1, right);
+}
+//双指针
+//cur找到比key小的值,++prev,cur和prev的位置的值交换，++cur
+//cur找到比key大的值,++cur
+//说明
+//prev要么紧跟着cur(prev下一个就是cur)
+//prev跟cur中间间隔着比key大的一段值区间
+//把比key大的值往右翻,把比key小的值翻到左边
+void QuickSort3(int* a, int left, int right)
+{
+	if (left >= right)
+	{
+		return;
+	}
+	int div = PartSort3(a, left, right);
+	QuickSort2(a, left, div - 1);
+	QuickSort2(a, div + 1, right);
 }
 void PrintArray(int* a, int n)
 {

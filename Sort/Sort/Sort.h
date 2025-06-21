@@ -52,4 +52,11 @@ void HeapSort(int* a, int n);
 //任取待排序元素序列中的某元素作为基准值,按照该排序码将待排序集合分割成两子序列,
 //左子序列中所有元素均小于基准值,右子序列中所有元素均大于基准值,
 //然后最左右子序列重复该过程,直到所有元素都排列在相应位置上为止。
-void QuickSort(int* a, int left, int right);
+//hoare版本
+void QuickSort1(int* a, int left, int right);
+
+//挖坑法
+void QuickSort2(int* a, int left, int right);
+
+//双指针
+void QuickSort3(int* a, int left, int right);
