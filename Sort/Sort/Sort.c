@@ -342,9 +342,289 @@ void QuickSort3(int* a, int left, int right)
 		return;
 	}
 	int div = PartSort3(a, left, right);
-	QuickSort2(a, left, div - 1);
-	QuickSort2(a, div + 1, right);
+	QuickSort3(a, left, div - 1);
+	QuickSort3(a, div + 1, right);
 }
+//如果去掉最后一层,递归减少1/2,倒数第2层减少1/4
+void QuickSort4(int* a, int left, int right)
+{
+	//小区间优化
+	if (left >= right)
+	{
+		return;
+	}
+	if ((right - left + 1) > 10)//插入的效率高于递归
+	{
+		int div = PartSort3(a, left, right);
+		QuickSort4(a, left, div - 1);
+		QuickSort4(a, div + 1, right);
+	}
+	else
+	{
+		InsertSort(a + left, right - left + 1);
+	}
+}
+//递归的问题
+//1.效率
+//2.深度太深会溢出
+//栈溢出:栈区域的空间不够了
+//递归改成非递归
+//1.直接改循环
+//2.使用栈辅助改循环
+//栈里面取一段区间,单趟排序
+//单趟分割子区间入栈
+//子区间只有一个值或者不存在就不入栈
+void QuickSortNone(int* a, int left, int right)
+{
+	ST st;
+	STInit(&st);
+	STPush(&st, right);
+	STPush(&st, left);
+	while (!STEmpty(&st))
+	{
+		int begin = STTop(&st);
+		STPop(&st);
+		int end = STTop(&st);
+		STPop(&st);
+		int keyi = PartSort3(a, begin, end);
+		//[begin, keyi - 1] keyi [keyi + 1, end]
+		if (keyi + 1 < end)
+		{
+			STPush(&st, end);
+			STPush(&st, keyi + 1);
+		}
+		if (begin < keyi - 1)
+		{
+			STPush(&st, keyi - 1);
+			STPush(&st, begin);
+		}
+	}
+	STDestroy(&st);
+}
+void _MergeSort(int* a, int begin, int end, int* tmp)
+{
+	if (begin >= end)
+	{
+		return;
+	}
+	int mid = (begin + end) / 2;
+	//[begin, mid][mid + 1, end]  子区间递归排序
+	_MergeSort(a, begin, mid, tmp);
+	_MergeSort(a, mid + 1, end, tmp);
+	//[begin, mid][mid + 1, end]  归并
+	int begin1 = begin;
+	int end1 = mid;
+	int begin2 = mid + 1;
+	int end2 = end;
+	int i = begin;
+	while (begin1 <= end1 && begin2 <= end2)
+	{
+		if (a[begin1] < a[begin2])
+		{
+			//谁小谁尾插
+			tmp[i++] = a[begin1++];
+		}
+		else
+		{
+			tmp[i++] = a[begin2++];
+		}
+	}
+	while (begin1 <= end1)
+	{
+		tmp[i++] = a[begin1++];
+	}
+	while (begin2 <= end2)
+	{
+		tmp[i++] = a[begin2++];
+	}
+	memcpy(a + begin, tmp + begin, sizeof(int) * (end - begin + 1));
+}
+void MergeSort(int* a, int n)
+{
+	int* tmp = (int*)malloc(sizeof(int) * n);
+	if (tmp == NULL)
+	{
+		perror("malloc fail");
+		return;
+	}
+	_MergeSort(a, 0, n - 1, tmp);
+	free(tmp);
+}
+
+
+//end1越界了,不归并
+//end1没有越界,begin2越界,和1一样处理
+//end1,begin1没有越界,end2越界,继续归并,修正到end2
+//方法1---直接拷贝
+void MergeSortNone1(int* a, int n)
+{
+	int* tmp = (int*)malloc(sizeof(int) * n);
+	if (tmp == NULL)
+	{
+		perror("malloc fail");
+		return;
+	}
+	int gap = 1;//gap是归并过程中每组的数据个数
+	int i = 0;
+	while (gap < n)
+	{
+		for (i = 0; i < n; i += 2 * gap)
+		{
+			//[begin1, end1][begin2, end2]
+			int begin1 = i;
+			int end1 = i + gap - 1;
+			int begin2 = gap + i;//begin2 = end + 1;
+			int end2 = i + 2 * gap - 1;
+			//修正路线(不归并)
+			if (end1 >= n)
+			{
+				//第2个区间不存在
+				end1 = n - 1;
+				begin2 = n;
+				end2 = n - 1;
+			}
+			if (begin2 >= n)
+			{
+				begin2 = n;
+				end2 = n - 1;
+			}
+			if (end2 >= n)
+			{
+				end2 = n - 1;
+			}
+			//printf("[%d, %d][%d, %d] ", begin1, end1, begin2, end2);
+			int j = i;
+			while (begin1 <= end1 && begin2 <= end2)
+			{
+				if (a[begin1] < a[begin2])
+				{
+					//谁小谁尾插
+					tmp[j++] = a[begin1++];
+				}
+				else
+				{
+					tmp[j++] = a[begin2++];
+				}
+			}
+			while (begin1 <= end1)
+			{
+				tmp[j++] = a[begin1++];
+			}
+			while (begin2 <= end2)
+			{
+				tmp[j++] = a[begin2++];
+			}
+		}
+		memcpy(a, tmp, sizeof(int) * n);
+		gap *= 2;
+	}
+	free(tmp);
+}
+//方法2---分别拷贝两个区间
+void MergeSortNone2(int* a, int n)
+{
+	int* tmp = (int*)malloc(sizeof(int) * n);
+	if (tmp == NULL)
+	{
+		perror("malloc fail");
+		return;
+	}
+	int gap = 1;//gap是归并过程中每组的数据个数
+	int i = 0;
+	while (gap < n)
+	{
+		for (i = 0; i < n; i += 2 * gap)
+		{
+			//[begin1, end1][begin2, end2]
+			int begin1 = i;
+			int end1 = i + gap - 1;
+			int begin2 = gap + i;//begin2 = end + 1;
+			int end2 = i + 2 * gap - 1;
+			//修正路线(不归并)
+			if (end1 >= n || begin2 >= n)
+			{
+				break;
+			}
+			if (end2 >= n)
+			{
+				end2 = n - 1;
+			}
+			//printf("[%d, %d][%d, %d] ", begin1, end1, begin2, end2);
+			int j = i;
+			while (begin1 <= end1 && begin2 <= end2)
+			{
+				if (a[begin1] < a[begin2])
+				{
+					//谁小谁尾插
+					tmp[j++] = a[begin1++];
+				}
+				else
+				{
+					tmp[j++] = a[begin2++];
+				}
+			}
+			while (begin1 <= end1)
+			{
+				tmp[j++] = a[begin1++];
+			}
+			while (begin2 <= end2)
+			{
+				tmp[j++] = a[begin2++];
+			}
+			//归并一部分拷贝一部分
+			memcpy(a + i, tmp + i, sizeof(int) * (end2 - i + 1));
+		}
+		gap *= 2;
+	}
+	free(tmp);
+}
+
+//时间复杂度:O(N+range)
+//空间复杂度:O(range)
+void CountSort(int* a, int n)
+{
+	int max = a[0], min = a[0];
+	int i = 0;
+	for (i = 0;i < n;i++)
+	{
+		if (a[i] > max)
+		{
+			max = a[i];
+		}
+		if (a[i] < min)
+		{
+			min = a[i];
+		}
+	}
+	//左闭右闭
+	int range = max - min + 1;
+	int* countA = (int*)malloc(sizeof(int) * range);
+	if (countA == NULL)
+	{
+		perror("malloc fail");
+		return;
+	}
+	memset(countA, 0, sizeof(int) * range);
+	//计数
+	for (i = 0;i < n;i++)
+	{
+		countA[a[i] - min]++;
+	}
+	//排序
+	//n--循环走n次
+	//--n循环走n-1次
+	int j = 0;
+	for (i = 0;i < range;i++)
+	{
+		while (countA[i]--)
+		{
+			a[j++] = i + min;
+		}
+	}
+	free(countA);
+}
+
+
 void PrintArray(int* a, int n)
 {
 	int i = 0;

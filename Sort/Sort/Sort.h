@@ -1,8 +1,10 @@
 #pragma once
-#include<stdio.h>
-#include<stdlib.h>
-#include<time.h>
-#include<stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <stdbool.h>
+#include <string.h>
+#include "stack.h"
 typedef int HPDataType;
 typedef struct Heap
 {
@@ -60,3 +62,36 @@ void QuickSort2(int* a, int left, int right);
 
 //双指针
 void QuickSort3(int* a, int left, int right);
+
+//小区间优化
+void QuickSort4(int* a, int left, int right);
+
+//快速排序非递归
+void QuickSortNone(int* a, int left, int right);
+
+//归并排序(后序遍历)
+//可以用作外排序,即在磁盘中排序
+//两个有序空间归并:
+//依次比较,小的尾插到新空间
+void MergeSort(int* a, int n);
+
+//子函数
+void _MergeSort(int* a, int begin, int end, int* tmp);
+
+//归并排序非递归
+void MergeSortNone1(int* a, int n);
+
+void MergeSortNone2(int* a, int n);
+
+//非比较排序
+//适用于一些特殊情况
+//计数排序
+//适合范围集中,且范围不大的整型数组排序
+//不适合范围分散,或者非整形的排序
+//1.统计相同元素出现次数(提高效率)
+//2.根据统计的结果将序列回收到原来的序列中
+void CountSort(int* a, int n);
+
+//基数排序(实际中没什么应用)
+
+//桶排序(实际中没什么应用)

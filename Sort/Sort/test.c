@@ -8,20 +8,22 @@
 
 void TestInsert()
 {
-	int a[] = { 6,1,2,6,9,3,4,6,10,8 };
+	int a[] = { 10,6,7,1,3,9,4,2,0,-1,-4 };
 	int sz = sizeof(a) / sizeof(a[0]);
 	//InsertSort(a, sz);
 	//BubbleSort(a, sz);
 	//ShellSort(a, sz);
 	//SelectSort(a, sz);
 	//HeapSort(a, sz);
-	QuickSort1(a, 0, sz - 1);
+	//QuickSortNone(a, 0, sz - 1);
+	//MergeSortNone2(a, sz);
+	CountSort(a, sz);
 	PrintArray(a, sz);
 }
 void TestOP()
 {
 	srand(time(0));
-	const int N = 1000000;
+	const int N = 100000;
 	int* a1 = (int*)malloc(sizeof(int) * N);
 	int* a2 = (int*)malloc(sizeof(int) * N);
 	int* a3 = (int*)malloc(sizeof(int) * N);
@@ -53,7 +55,7 @@ void TestOP()
 	HeapSort(a4, N);
 	int end4 = clock();
 	int begin5 = clock();
-	QuickSort2(a5, 0, N - 1);
+	QuickSort4(a5, 0, N - 1);
 	int end5 = clock();
 	int begin6 = clock();
 	//MergeSort(a6, N);
@@ -74,6 +76,7 @@ void TestOP()
 	free(a4);
 	free(a5);
 	free(a6);
+	free(a7);
 }
 int main()
 {
