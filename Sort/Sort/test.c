@@ -8,16 +8,16 @@
 
 void TestInsert()
 {
-	int a[] = { 10,6,7,1,3,9,4,2,0,-1,-4 };
+	int a[] = { 9,8,7,6,5,4,3,2,1,0 };
 	int sz = sizeof(a) / sizeof(a[0]);
 	//InsertSort(a, sz);
 	//BubbleSort(a, sz);
 	//ShellSort(a, sz);
 	//SelectSort(a, sz);
 	//HeapSort(a, sz);
-	//QuickSortNone(a, 0, sz - 1);
+	QuickSortNone(a, 0, sz - 1);
 	//MergeSortNone2(a, sz);
-	CountSort(a, sz);
+	//CountSort(a, sz);
 	PrintArray(a, sz);
 }
 void TestOP()

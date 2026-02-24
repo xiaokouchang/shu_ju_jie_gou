@@ -65,3 +65,5 @@ void STLLoadSList(STLNode** pphead);
 void STLSaveSList(STLNode** pphead);
 
 
+STLNode* removeElements(STLNode* head, int val);
+

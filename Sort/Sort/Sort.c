@@ -303,6 +303,7 @@ int GetMidNumi(int* a, int left, int right)
 //R找小,L没有找到大,L遇到R
 //类似道理,右边做key,左边先走,相遇位置就比key要大
 //hoare版本
+
 void QuickSort1(int* a, int left, int right)
 {
 	if (left >= right)
