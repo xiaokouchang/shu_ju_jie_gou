@@ -15,7 +15,8 @@ void TestInsert()
 	//ShellSort(a, sz);
 	//SelectSort(a, sz);
 	//HeapSort(a, sz);
-	QuickSortNone(a, 0, sz - 1);
+	QuickSort1(a, 0, sz - 1);
+	//QuickSortNone(a, 0, sz - 1);
 	//MergeSortNone2(a, sz);
 	//CountSort(a, sz);
 	PrintArray(a, sz);

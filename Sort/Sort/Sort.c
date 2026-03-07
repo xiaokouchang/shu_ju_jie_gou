@@ -188,6 +188,7 @@ void SelectSort(int* a, int n)
 		right--;
 	}
 }
+//hero分区
 int PartSort1(int* a, int left, int right)
 {
 	//随机选keyi
@@ -218,8 +219,18 @@ int PartSort1(int* a, int left, int right)
 	keyi = left;
 	return keyi;
 }
+//挖坑法
 int PartSort2(int* a, int left, int right)
 {
+	//三数取中
+	//int mid = GetMidNumi(a, left, right);
+	//if (mid != left)
+	//{
+	//	Swap(&a[mid], &a[left]);
+	//}
+	//int key = a[left];
+	//int hole = left;
+	//以最左边为基准值
 	int key = a[left];
 	int hole = left;
 	while (left < right)
@@ -266,11 +277,11 @@ int GetMidNumi(int* a, int left, int right)
 	int mid = (left + right) / 2;
 	if (a[left] < a[mid])
 	{
-		if (a[mid] < a[right])
+		if (a[mid] < a[right])//left<mid<right
 		{
 			return mid;
 		}
-		else if(a[left] > a[right])
+		else if(a[left] > a[right])//right<left<mid
 		{
 			return left;
 		}
@@ -281,11 +292,11 @@ int GetMidNumi(int* a, int left, int right)
 	}
 	else  //(a[left] > a[mid])
 	{
-		if (a[mid] > a[right])
+		if (a[mid] > a[right])//right<mid<left
 		{
 			return mid;
 		}
-		else if (a[left] < a[right])
+		else if (a[left] < a[right])//mid<left<right<
 		{
 			return left;
 		}
