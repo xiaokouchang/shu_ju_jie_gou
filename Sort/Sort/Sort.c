@@ -159,8 +159,8 @@ void HeapSort(int* a, int n)
 void SelectSort(int* a, int n)
 {
 	//最小的数放在左边,最大的数放在右边
-	int i = 0;
 	int left = 0;
+	int i = 0;
 	int right = n - 1;
 	while (left < right)
 	{
@@ -175,16 +175,15 @@ void SelectSort(int* a, int n)
 			if (a[i] > a[maxi])
 			{
 				maxi = i;
-			}
+ 			}
 		}
-		Swap(&a[left], &a[mini]);
-		//left和maxi重叠,交换后修正一下
-		if (left == maxi)
+		Swap(&a[mini], a[left]);
+		if (maxi == left)
 		{
 			maxi = mini;
 		}
-		Swap(&a[right], &a[maxi]);
-		left++;
+		Swap(&a[maxi], a[right]);
+		left++; 
 		right--;
 	}
 }
