@@ -21,7 +21,7 @@ namespace key
 		{}
 	};
 
-	template<class K>
+	template<class K,class V>
 	class BSTree
 	{
 		typedef BSTreeNode<K> Node;
@@ -30,13 +30,16 @@ namespace key
 			:_root(nullptr)
 		{
 		}
-		BSTree(const BSTree<K>& t)
+		BSTree(const BSTree<K,V>& t)
 		{
 			_root = Copy(t._root);
 		}
-		BSTree<K>& operator=(BSTree<K> t)
+		//赋值运算符的规则：只能修改等号左边,绝对不能修改等号右边
+		//tree1 = tree2
+		//调用拷贝构造函数生成临时变量t,交换tree1._root和tree2._root,tree2全程没参与,函数结束,t被销毁,自动释放旧树内存
+		BSTree<K,V>& operator=(BSTree<K,V> t)//传值拷贝,调用拷贝构造函数,传引用会修改等号右边的变量
 		{
-			swap(_root, t._root);
+			swap(t._root, _root);//交换指针的地址
 			return *this;
 		}
 		~BSTree()
@@ -166,22 +169,30 @@ namespace key
 					{
 						//找替代节点
 						//Node* parent = nullptr;
-						Node* parent = cur;
-						Node* leftMax = cur->_left;
+						Node* parent = cur;          //记录替代节点的父节点（初始指向cur）
+						Node* leftMax = cur->_left;  //从cur的左子树开始找
+						//找一个节点,这个节点的值比左边都大、比右边都小,即左子树中最右边的节点,也就是左子树最大值
+						//左子树一路向右走 → 找到最大节点（BST规则：左子树的右孩子最大）
 						while (leftMax->_right)
 						{
-							parent = leftMax;
-							leftMax = leftMax->_right;
+							parent = leftMax;       //父节点跟着往前走
+							leftMax = leftMax->_right; //一直走到没有右孩子
 						}
+						//交换要删除的节点和替代节点的值
 						swap(cur->_key, leftMax->_key);
+						//删除替代节点leftMax,把它的子节点交给父节点
 						if (parent->_left == leftMax)
 						{
+							//替代节点是父节点的左孩子
+							//此时leftmax->_right==NULL,所以父节点只能接管它的左孩子,不可能接管右孩子！
 							parent->_left = leftMax->_left;
 						}
 						else
 						{
+							//替代节点是父节点的右孩子
 							parent->_right = leftMax->_left;
 						}
+						//最后释放替代节点的内存
 						cur = leftMax;
 					}
 					delete cur;
@@ -230,7 +241,6 @@ namespace key
 			delete root;
 			root = nullptr;
 		}
-
 		//引用不能改变指向,循环中不能使用,递归每次会产生新的引用
 		//C++不能缺少指针
 		bool _EreaseR(Node*& root, const K& key)
@@ -316,7 +326,6 @@ namespace key
 				return true;
 			}
 		}
-
 		//中序遍历
 		void _InOrder(Node* root)
 		{
@@ -335,157 +344,157 @@ namespace key
 }
 
 
-//namespace key_value
-//{
-//	template<class K,class V>
-//	//BinarySearchTreeNode  --->   BSTreeNode
-//	class BSTreeNode
-//	{
-//	public:
-//		BSTreeNode<K, V>* _left;
-//		BSTreeNode<K, V>* _right;
-//		K _key;
-//		V _value;
-//		BSTreeNode(const K& key, const V& value)
-//			: _left(nullptr)
-//			, _right(nullptr)
-//			, _key(key)
-//			, _value(value)
-//		{}
-//	};
-//
-//
-//	template<class K, class V>
-//	class BSTree
-//	{
-//		typedef BSTreeNode<K, V> Node;
-//	public:
-//		BSTree()
-//			:_root(nullptr)
-//		{}
-//		//中序遍历
-//		void InOrder()
-//		{
-//			_InOrder(_root);
-//			cout << endl;
-//		}
-//		//递归
-//		Node* FindR(const K& key)
-//		{
-//			return _FindR(_root, key);
-//		}
-//		bool InsertR(const K& key,const V& value)
-//		{
-//			return _InsertR(_root, key, value);
-//		}
-//		bool EreaseR(const K& key)
-//		{
-//			return _EreaseR(_root, key);
-//		}
-//	private:
-//		//引用不能改变指向,循环中不能使用,递归每次会产生新的引用
-//		//C++不能缺少指针
-//		bool _EreaseR(Node*& root, const K& key)
-//		{
-//			if (root == nullptr)
-//			{
-//				return false;
-//			}
-//			if (root->_key < key)
-//			{
-//				return _EreaseR(root->_right, key);
-//			}
-//			else if (root->_key > key)
-//			{
-//				return _EreaseR(root->_left, key);
-//			}
-//			else
-//			{
-//				//左为空
-//				//右为空
-//				//左右都不为空
-//				Node* del = root;
-//				if (root->_left == nullptr)
-//				{
-//					root = root->_right;
-//				}
-//				else if (root->_right == nullptr)
-//				{
-//					root = root->_left;
-//				}
-//				else
-//				{
-//					Node* leftMax = root->_left;
-//					while (leftMax->_right)
-//					{
-//						leftMax = leftMax->_right;
-//					}
-//					swap(root->_key, leftMax->_key);
-//					return _EreaseR(root->_left, key);
-//					//return _EreaseR(leftMax, key);
-//				}
-//				delete del;
-//				return true;
-//			}
-//		}
-//		//可以将parent传递,这里使用传引用
-//		//value不参与这个过程
-//		bool _InsertR(Node*& root, const K& key, const V& value)
-//		{
-//			if (root == NULL)
-//			{
-//				root = new Node(key, value);
-//				return true;
-//			}
-//			if (root->_key < key)
-//			{
-//				return _InsertR(root->_right, key, value);
-//			}
-//			else if (root->_key > key)
-//			{
-//				return _InsertR(root->_left, key, value);
-//			}
-//			else
-//			{
-//				return true;
-//			}
-//		}
-//		Node* _FindR(Node* root, const K& key)//key不能改变,value可以改变
-//		{
-//			if (root == NULL)
-//			{
-//				return nullptr;
-//			}
-//			if (root->_key < key)
-//			{
-//				return _FindR(root->_right, key);
-//			}
-//			else if (root->_key > key)
-//			{
-//				return _FindR(root->_left, key);
-//			}
-//			else
-//			{
-//				return root;
-//			}
-//		}
-//
-//		//中序遍历
-//		void _InOrder(Node* root)
-//		{
-//			if (root == NULL)
-//			{
-//				//printf("NULL ");
-//				return;
-//			}
-//			cout << root->_key << ":" << root->_value << endl;
-//			_InOrder(root->_left);
-//			_InOrder(root->_right);
-//		}
-//	private:
-//		Node* _root;
-//	};
-//}
+namespace key_value
+{
+	template<class K,class V>
+	//BinarySearchTreeNode  --->   BSTreeNode
+	class BSTreeNode
+	{
+	public:
+		BSTreeNode<K, V>* _left;
+		BSTreeNode<K, V>* _right;
+		K _key;
+		V _value;
+		BSTreeNode(const K& key, const V& value)
+			: _left(nullptr)
+			, _right(nullptr)
+			, _key(key)
+			, _value(value)
+		{}
+	};
+
+
+	template<class K, class V>
+	class BSTree
+	{
+		typedef BSTreeNode<K, V> Node;
+	public:
+		BSTree()
+			:_root(nullptr)
+		{}
+		//中序遍历
+		void InOrder()
+		{
+			_InOrder(_root);
+			cout << endl;
+		}
+		//递归
+		Node* FindR(const K& key)
+		{
+			return _FindR(_root, key);
+		}
+		bool InsertR(const K& key,const V& value)
+		{
+			return _InsertR(_root, key, value);
+		}
+		bool EreaseR(const K& key)
+		{
+			return _EreaseR(_root, key);
+		}
+	private:
+		//引用不能改变指向,循环中不能使用,递归每次会产生新的引用
+		//C++不能缺少指针
+		bool _EreaseR(Node*& root, const K& key)
+		{
+			if (root == nullptr)
+			{
+				return false;
+			}
+			if (root->_key < key)
+			{
+				return _EreaseR(root->_right, key);
+			}
+			else if (root->_key > key)
+			{
+				return _EreaseR(root->_left, key);
+			}
+			else
+			{
+				//左为空
+				//右为空
+				//左右都不为空
+				Node* del = root;
+				if (root->_left == nullptr)
+				{
+					root = root->_right;
+				}
+				else if (root->_right == nullptr)
+				{
+					root = root->_left;
+				}
+				else
+				{
+					Node* leftMax = root->_left;
+					while (leftMax->_right)
+					{
+						leftMax = leftMax->_right;
+					}
+					swap(root->_key, leftMax->_key);
+					return _EreaseR(root->_left, key);
+					//return _EreaseR(leftMax, key);
+				}
+				delete del;
+				return true;
+			}
+		}
+		//可以将parent传递,这里使用传引用
+		//value不参与这个过程
+		bool _InsertR(Node*& root, const K& key, const V& value)
+		{
+			if (root == NULL)
+			{
+				root = new Node(key, value);
+				return true;
+			}
+			if (root->_key < key)
+			{
+				return _InsertR(root->_right, key, value);
+			}
+			else if (root->_key > key)
+			{
+				return _InsertR(root->_left, key, value);
+			}
+			else
+			{
+				return true;
+			}
+		}
+		Node* _FindR(Node* root, const K& key)//key不能改变,value可以改变
+		{
+			if (root == NULL)
+			{
+				return nullptr;
+			}
+			if (root->_key < key)
+			{
+				return _FindR(root->_right, key);
+			}
+			else if (root->_key > key)
+			{
+				return _FindR(root->_left, key);
+			}
+			else
+			{
+				return root;
+			}
+		}
+
+		//中序遍历
+		void _InOrder(Node* root)
+		{
+			if (root == NULL)
+			{
+				//printf("NULL ");
+				return;
+			}
+			cout << root->_key << ":" << root->_value << endl;
+			_InOrder(root->_left);
+			_InOrder(root->_right);
+		}
+	private:
+		Node* _root;
+	};
+}
 //搜索二叉树的应用
 //key的搜索模型 
 //快速判断在不在的场景,门禁系统,小车辆出入系统
