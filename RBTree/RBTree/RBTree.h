@@ -112,7 +112,8 @@ public:
 				//uncle存在且为红
 				if (uncle && uncle->_col == RED)
 				{
-					//变色
+					//局部变色
+					//红黑节点的数量不变,暂时解决了连续的红节点
 					parent->_col = uncle->_col = BLACK;
 					grandfather->_col = RED;
 					
@@ -122,6 +123,9 @@ public:
 				}
 				else//uncle不存在或者存在且为黑
 				{
+					//  g(black)
+					// p(red)
+					//c(red)
 					if (cur == parent->_left)
 					{
 						RotateR(grandfather);
@@ -165,9 +169,9 @@ public:
 					}
 					else
 					{
-						//g 
-						//  p
-						//    c
+						// g 
+						//p
+						// c
 						RotateR(parent);
 						RotateL(grandfather);
 						cur->_col = BLACK;

@@ -334,8 +334,8 @@ namespace key
 				printf("NULL ");
 				return;
 			}
-			cout << root->_key << " ";
 			_InOrder(root->_left);
+			cout << root->_key << " ";
 			_InOrder(root->_right);
 		}
 	private:

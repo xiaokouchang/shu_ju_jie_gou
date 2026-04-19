@@ -210,29 +210,32 @@ public:
 	}
 	//先右单旋再左单旋(折线)
 	//    30 
-	//       60 
-	//    90
+	//       90 
+	//    60
 	void RotateRL(Node* parent)
 	{
 		Node* cur = parent->_right;
 		Node* curleft = cur->_left;
 		int bf = curleft->_bf;
-		RotateR(parent->_right);
+		RotateR(parent->_right);//cur->_bf有问题?
 		RotateL(parent);
 		if (bf == 0)
 		{
+			//60本身是新增
 			cur->_bf = 0;
 			curleft->_bf = 0;
 			parent->_bf = 0;
 		}
 		else if (bf == 1)
 		{
+			//60的右边插入
 			cur->_bf = 0;
 			curleft->_bf = 0;
 			parent->_bf = -1;
 		}
 		else if (bf == -1)
 		{
+			//60的左边插入
 			cur->_bf = 1;
 			curleft->_bf = 0;
 			parent->_bf = 0;
